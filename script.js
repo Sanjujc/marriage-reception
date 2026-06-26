@@ -262,38 +262,49 @@ if (canvas) {
 }
 
 // --- Smart Calendar Integration ---
-const saveDateBtn = document.getElementById('saveDateBtn');
-if (saveDateBtn) {
-    saveDateBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        
-        const title = "Sanju & Surya - Reception";
-        const location = "RDR Convention Centre, Kochar Road, Edapazhanji, Thiruvananthapuram";
-        const details = "Evening celebration. We can't wait to see you!";
-        
-        // Detect Apple Devices (iOS/Mac) to provide native Calendar/Reminders integration
-        const isAppleDevice = /(Mac|iPhone|iPod|iPad)/i.test(navigator.userAgent);
-        
-        if (isAppleDevice) {
-            // Generate standard .ics file format
-            const icsContent = 
+function setupCalendarBtn(btnId, eventDetails) {
+    const btn = document.getElementById(btnId);
+    if (btn) {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const { title, location, details, startDate, endDate } = eventDetails;
+            const isAppleDevice = /(Mac|iPhone|iPod|iPad)/i.test(navigator.userAgent);
+            
+            if (isAppleDevice) {
+                const icsContent = 
 "BEGIN:VCALENDAR\n" +
 "VERSION:2.0\n" +
 "BEGIN:VEVENT\n" +
-"DTSTART:20260914T113000Z\n" +
-"DTEND:20260914T153000Z\n" +
+"DTSTART:" + startDate + "\n" +
+"DTEND:" + endDate + "\n" +
 "SUMMARY:" + title + "\n" +
 "DESCRIPTION:" + details + "\n" +
 "LOCATION:" + location + "\n" +
 "END:VEVENT\n" +
 "END:VCALENDAR";
 
-            const uri = "data:text/calendar;charset=utf8," + encodeURIComponent(icsContent);
-            window.location.href = uri;
-        } else {
-            // Standard Google Calendar template for Android / Web
-            const googleUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=20260914T113000Z/20260914T153000Z&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`;
-            window.open(googleUrl, '_blank');
-        }
-    });
+                const uri = "data:text/calendar;charset=utf8," + encodeURIComponent(icsContent);
+                window.location.href = uri;
+            } else {
+                const googleUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${startDate}/${endDate}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`;
+                window.open(googleUrl, '_blank');
+            }
+        });
+    }
 }
+
+setupCalendarBtn('saveMarriageDateBtn', {
+    title: "Sanju & Surya - Marriage",
+    location: "Ananthapuri Auditorium, Jagathy, Thiruvananthapuram",
+    details: "Marriage ceremony (Muhurtham: 11:00 am - 11:30 am). We can't wait to see you!",
+    startDate: "20260913T043000Z", // 10:00 am IST (Arrival / Sweekaranam)
+    endDate: "20260913T073000Z"   // 1:00 pm IST
+});
+
+setupCalendarBtn('saveReceptionDateBtn', {
+    title: "Sanju & Surya - Reception",
+    location: "RDR Convention Centre, Kochar Road, Edapazhanji, Thiruvananthapuram",
+    details: "Evening celebration. We can't wait to see you!",
+    startDate: "20260914T113000Z", // 5:00 pm IST
+    endDate: "20260914T153000Z"   // 9:00 pm IST
+});
